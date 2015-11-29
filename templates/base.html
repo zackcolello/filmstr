@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+
+      <!-- website icon -->
+      <link rel="shortcut icon" type="image/png" href="/static/images/filmstriconwhite.png"/>
+
+      <!-- jQuery library -->
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+      <!-- tubular -->
+      <script src="/static/plugins/js/jquery.tubular.1.0.js"></script>
+      <script src="/static/plugins/js/index.js"></script>
+
+      <!-- Bootstrap -->
+      <script src="/static/plugins/js/bootstrap.js"></script>
+      <link href="/static/plugins/css/bootstrap.css" rel="stylesheet">
+
+      <!-- Typeahead -->
+      <script src="/static/plugins/js/typeahead.js"></script>
+
+     <!-- Google fonts -->
+      <link href='https://fonts.googleapis.com/css?family=Lobster' rel='stylesheet' type='text/css'>
+
+      <!-- Local stylesheets and js -->
+      <link href="/static/plugins/css/main.css" rel="stylesheet">
+      <script src="/static/plugins/js/main.js"></script>
+
+  </head>
+
+  <body>
+  <div id="wrapper" class="clearfix">
+  <nav class="navbar navbar-inverse">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="/"><img id="filmstrIconSmall" src="/static/images/filmstriconwhite.png"/></a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav">
+        <li class="active"><a href="/">Home</a></li>
+        <li class="dropdown">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#">Movies<span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="#">All Genres</a></li>
+            <li><a href="#">Action</a></li>
+            <li><a href="#">Adventure</a></li>
+              <li><a href="#">Fantasy</a></li>
+              <li><a href="#">Horror</a></li>
+          </ul>
+        </li>
+
+
+        <li><a href="#">Actors</a></li>
+        <li><a href="#">Sessions</a></li>
+      </ul>
+
+
+      <ul class="nav navbar-nav navbar-right">
+
+        <li>
+            <form class="navbar-form">
+                <div class="form-group" style="display:inline;">
+                    <div class="input-group">
+                    <input class="form-control searchBar" type="text" placeholder="Search Movies">
+                    <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-search"></span>
+                    </span>
+                    </div>
+                </div>
+            </form>
+        </li>
+
+        <li><a href="/signup"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
+        <li><a href="/login"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+      </ul>
+    </div>
+
+</nav>
+
+      {% block content %}
+      {% endblock %}
+
+  </div>
+
+  </body>
+</html>
