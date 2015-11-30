@@ -1,8 +1,16 @@
 from flask.ext.wtf import Form
-from wtforms import TextField, validators
+from wtforms import TextField, PasswordField, validators, StringField
+
+
+class RegistrationForm(Form):
+    inputUsername = StringField('Username', [validators.Length(min=4, max=40)])
+    inputPassword = PasswordField('Password', [validators.required()])
+    inputFirstName = StringField('FirstName')
+    inputLastName = StringField('FirstName')
 
 class EnterDBInfo(Form):
     dbNotes = TextField(label='Items to add to DB', description="db_enter", validators=[validators.required(), validators.Length(min=0, max=128, message=u'Enter 128 characters or less')])    
+
 
 class RetrieveDBInfo(Form):
     numRetrieve = TextField(label='Number of DB Items to Get', description="db_get", validators=[validators.required(), validators.Regexp('^\d{1}$',message=u'Enter a number between 1 and 10')])

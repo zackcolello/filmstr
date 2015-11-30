@@ -1,31 +1,112 @@
-'''
-Simple Flask application to test deployment to Amazon Web Services
-Uses Elastic Beanstalk and RDS
-
-Author: Scott Rodkey - rodkeyscott@gmail.com
-
-Step-by-step tutorial: https://medium.com/@rodkey/deploying-a-flask-application-on-aws-a72daba6bb80
-'''
-
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 from application import db
-from application.models import Data
-from application.forms import EnterDBInfo, RetrieveDBInfo
+from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String
+from application.models import Data, Users
+from application.forms import EnterDBInfo, RetrieveDBInfo, RegistrationForm
+from wtforms import Form, TextField, validators
 
-# Elastic Beanstalk initalization
+
+# Elastic Beanstalk initialization
 application = Flask(__name__)
-application.debug=True
+application.debug = True
 # change this to your own value
 application.secret_key = 'cC1YCIWOj9GgWspgNEo2'   
+engine = create_engine('mysql+pymysql://zackcolello:Fmtvv22632@db.cqa9wktokxlq.us-west-2.rds.amazonaws.com:3306/db')
 
 
-@application.route('/login', methods=['GET', 'POST'])
+@application.route('/login/', methods=['GET', 'POST'])
 def login():
-    return render_template('login.html')
+
+    error = ''
+
+    try:
+        if request.method == "POST":  # User has entered username
+            attempted_username = request.form['inputUsername']
+            attempted_password = request.form['inputPassword']
+
+            # Check if user exists
+
+            metadata = MetaData(bind=engine)
+            users = Table('users', metadata, autoload=True)
+
+            r = users.select(users.c.email == attempted_username).execute().first()
+
+            if r['pw'] != attempted_password:
+                error = "Invalid Password. Try again."
+                return render_template('signup.html', error=error)
+
+            if r is not None:
+
+                session['logged_in'] = True
+                session['username'] = r['email']
+
+                return redirect(url_for('index'))
+
+            else:
+                error = "Invalid Credentials. Try again."
+
+        return render_template('login.html', error=error)
+
+    except Exception as e:
+        return render_template("login.html", error=error)
+
+
+@application.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('index'))
 
 @application.route('/signup', methods=['GET', 'POST'])
 def signup():
-    return render_template('signup.html')
+
+    error = ''
+
+    try:
+        form = RegistrationForm(request.form)
+
+        if request.method == "POST":
+            username = form.inputUsername.data
+            pw = form.inputPassword.data
+            firstName = form.inputFirstName.data
+            lastName = form.inputLastName.data
+
+            # check if user already exists
+
+            metadata = MetaData(bind=engine)
+            users = Table('users', metadata, autoload=True)
+
+            r = users.select(users.c.email == username).execute().first()
+
+            if r is not None:
+                error = "Username already taken. Try again."
+                return render_template('signup.html', error=error)
+
+            newuser = Users(pw=pw, firstName=firstName, lastName=lastName, email=username)
+
+            try:
+                db.session.add(newuser)
+                db.session.commit()
+                db.session.close()
+
+                session['logged_in'] = True
+                session['username'] = username
+                return render_template('index.html')
+
+            except Exception as e:
+                db.session.rollback()
+
+        return render_template('signup.html')
+
+    except Exception as e:
+        return str(e)
+
+    # return render_template('signup.html')
+
+
+@application.route('/movie', methods=['GET', 'POST'])
+def movie():
+    return render_template('movie.html')
+
 
 @application.route('/', methods=['GET', 'POST'])
 @application.route('/index', methods=['GET', 'POST'])

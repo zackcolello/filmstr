@@ -66,17 +66,27 @@
             <form class="navbar-form">
                 <div class="form-group" style="display:inline;">
                     <div class="input-group">
-                    <input class="form-control searchBar" type="text" placeholder="Search Movies">
-                    <span class="input-group-addon">
-                        <span class="glyphicon glyphicon-search"></span>
-                    </span>
+                        <form method="post" action="/index" id="moviesearch" name="moviesearch">
+                            <input class="form-control searchBar" type="text" placeholder="Search Movies">
+                            <span class="input-group-addon">
+                                <span type="submit" class="glyphicon glyphicon-search"></span>
+                            </span>
+                        </form>
                     </div>
+
+
                 </div>
             </form>
         </li>
 
-        <li><a href="/signup"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
-        <li><a href="/login"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+            {% if session.logged_in %}
+            <li><a href="/logout"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
+
+            {% else %}
+            <li><a href="/signup"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
+            <li><a href="/login"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+            {% endif %}
+
       </ul>
     </div>
 
