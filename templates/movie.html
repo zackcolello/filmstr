@@ -5,12 +5,41 @@
     <div class="container">
     <div class="jumbotron" align="center">
 
-        <h3 align="center" id="filmstr">Movie</h3>
+<h3 align="center" id="filmstr" style="font-size:40px; color:black; margin-top:-20px">{{ movie.title }}</h3>
+<h4>{{ movie.genre }}</h4>
+<div class="container">
 
-        <p>Movies and actors and friends and stuff</p>
+<h4>Actors</h4>
 
-  </div>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                {% for item in actors %}
+                    <tr>
+                        <td>{{ item.name }}</td>
+                    </tr>
+
+                {% endfor %}
+
+             </tbody>
+        </table>
+        </div>
+
+
+
+
+</div><!-- tab content -->
+</div><!-- end of container -->
+
+
 </div>
+</div>
+
 
 {% endblock %}
 

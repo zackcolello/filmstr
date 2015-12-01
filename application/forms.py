@@ -8,6 +8,10 @@ class RegistrationForm(Form):
     inputFirstName = StringField('FirstName')
     inputLastName = StringField('FirstName')
 
+
+class searchFriend(Form):
+    searchName = StringField('searchName')
+
 class EnterDBInfo(Form):
     dbNotes = TextField(label='Items to add to DB', description="db_enter", validators=[validators.required(), validators.Length(min=0, max=128, message=u'Enter 128 characters or less')])    
 

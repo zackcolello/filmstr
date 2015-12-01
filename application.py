@@ -1,8 +1,10 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from application import db
 from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String
-from application.models import Data, Users
+from application.models import Users, Friends, Actor_Movie_Title
 from application.forms import EnterDBInfo, RetrieveDBInfo, RegistrationForm
+from functools import wraps
+from sqlalchemy.orm import Load
 from wtforms import Form, TextField, validators
 
 
@@ -39,8 +41,9 @@ def login():
 
                 session['logged_in'] = True
                 session['username'] = r['email']
+                session['firstName'] = r['firstName']
 
-                return redirect(url_for('index'))
+                return redirect(url_for('home'))
 
             else:
                 error = "Invalid Credentials. Try again."
@@ -55,6 +58,151 @@ def login():
 def logout():
     session.clear()
     return redirect(url_for('index'))
+
+
+
+def login_required(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if 'logged_in' in session:
+            return f(*args, **kwargs)
+
+        else:
+            flash("You need to log in first.")
+            return redirect(url_for('login'))
+
+@login_required
+@application.route('/profile/<username>')
+@application.route('/profile/')
+def profile(username):
+
+    metadata = MetaData(bind=engine)
+    users = Table('users', metadata, autoload=True)
+
+    user = db.session.query(users).filter(users.c.email == username).first()
+
+    return render_template('profile.html', user=user)
+
+
+@login_required
+@application.route('/deletefriend/', methods=['POST'])
+def deletefriend():
+    # Get friends list
+    metadata = MetaData(bind=engine)
+    friends = Table('friends', metadata, autoload=True)
+    users = Table('users', metadata, autoload=True)
+
+    if request.form.get('friendName', None) is not None:
+        friendsearch = request.form.get('friendName', None)
+        potentialfriend = users.select(users.c.email == friendsearch).execute().first()
+
+        if potentialfriend is not None:
+
+            newfriendship = Friends(friend1=session['username'], friend2=potentialfriend['email'])
+            newfriendship2 = Friends(friend1=potentialfriend['email'], friend2=session['username'])
+
+            try:
+                db.session.remove(newfriendship)
+                db.session.remove(newfriendship2)
+                db.session.commit()
+                db.session.close()
+
+            except Exception as e:
+                db.session.rollback()
+
+    return redirect(url_for('home'))
+
+
+
+@login_required
+@application.route('/addfriend/', methods=['POST'])
+def addfriend():
+
+    # Get friends list
+    metadata = MetaData(bind=engine)
+    friends = Table('friends', metadata, autoload=True)
+    users = Table('users', metadata, autoload=True)
+
+    if request.form.get('friendName', None) is not None:
+        friendsearch = request.form.get('friendName', None)
+        potentialfriend = users.select(users.c.email == friendsearch).execute().first()
+
+        if potentialfriend is not None:
+
+            newfriendship = Friends(friend1=session['username'], friend2=potentialfriend['email'])
+            newfriendship2 = Friends(friend1=potentialfriend['email'], friend2=session['username'])
+
+            try:
+                db.session.add(newfriendship)
+                db.session.add(newfriendship2)
+                db.session.commit()
+                db.session.close()
+
+            except Exception as e:
+                db.session.rollback()
+
+    return redirect(url_for('home'))
+
+
+@login_required
+@application.route('/', methods=['GET', 'POST'])
+@application.route('/home', methods=['GET', 'POST'])
+def home():
+
+    #json parsing
+
+    # Get friends list
+    metadata = MetaData(bind=engine)
+    movies = Table('movie', metadata, autoload=True)
+
+    '''m = movies.select(movies).execute()
+
+    movieArr = []
+
+    for o in m:
+        movieArr.append("\"" + o['title'].strip('"\'') + "\"")
+
+    f1=open('./movies.json', 'w+')
+    return movieArr.__str__()
+'''
+    # Redirect to index if not logged in
+
+    if 'logged_in' not in session:
+        return redirect(url_for('index'))
+
+    # Get friends list
+    metadata = MetaData(bind=engine)
+    friends = Table('friends', metadata, autoload=True)
+    users = Table('users', metadata, autoload=True)
+    movie = Table('movie', metadata, autoload=True)
+    movie_lists = Table('movie_lists', metadata, autoload=True)
+
+    r = friends.select(friends.c.friend1 == session['username']).execute()
+
+    friendArray = []
+    for object in r:
+        friendArray.append(object['friend2'])
+
+    friends = []
+    for object in friendArray:
+        friends += db.session.query(users).filter(users.c.email == object)
+
+    # Get movies list
+    ml = movie_lists.select(movie_lists.c.username == session['username']).execute()
+
+    movieIDArray = []
+    for object in ml:
+        movieIDArray.append(object['movieID'])
+
+    moviesList = []
+    for object in movieIDArray:
+        moviesList += db.session.query(movies).filter(movies.c.movieID == object)
+
+
+    if 'logged_in' not in session:
+        return redirect(url_for('index'))
+
+    return render_template('home.html', friends=friends, movies=moviesList)
 
 @application.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -90,7 +238,8 @@ def signup():
 
                 session['logged_in'] = True
                 session['username'] = username
-                return render_template('index.html')
+                session['firstName'] = firstName
+                return render_template('home.html')
 
             except Exception as e:
                 db.session.rollback()
@@ -103,39 +252,27 @@ def signup():
     # return render_template('signup.html')
 
 
-@application.route('/movie', methods=['GET', 'POST'])
-def movie():
-    return render_template('movie.html')
+@application.route('/movie/', methods=['GET', 'POST'])
+@application.route('/movie/<movieID>', methods=['GET', 'POST'])
+def movie(movieID):
+
+    # Get movie
+    metadata = MetaData(bind=engine)
+    movies = Table('movie', metadata, autoload=True)
+    amt = Table('actor_movie_title', metadata, autoload=True)
+
+    movie = movies.select(movies.c.movieID == movieID).execute().first()
+    title = movie['title']
+
+    actors = amt.select(amt.c.Movie == title).execute()
 
 
-@application.route('/', methods=['GET', 'POST'])
+    return render_template('movie.html', movie=movie, actors=actors)
+
+
 @application.route('/index', methods=['GET', 'POST'])
 def index():
-    form1 = EnterDBInfo(request.form) 
-    form2 = RetrieveDBInfo(request.form) 
-    
-    if request.method == 'POST' and form1.validate():
-        data_entered = Data(notes=form1.dbNotes.data)
-        try:     
-            db.session.add(data_entered)
-            db.session.commit()        
-            db.session.close()
-        except:
-            db.session.rollback()
-        return render_template('thanks.html', notes=form1.dbNotes.data)
-        
-    if request.method == 'POST' and form2.validate():
-        try:   
-            num_return = int(form2.numRetrieve.data)
-            query_db = Data.query.order_by(Data.id.desc()).limit(num_return)
-            for q in query_db:
-                print(q.notes)
-            db.session.close()
-        except:
-            db.session.rollback()
-        return render_template('results.html', results=query_db, num_return=num_return)                
-    
-    return render_template('index.html', form1=form1, form2=form2)
+    return render_template('index.html')
 
 if __name__ == '__main__':
     application.run(host='0.0.0.0')

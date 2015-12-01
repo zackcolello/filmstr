@@ -18,15 +18,46 @@ class Users(db.Model):
         return '<Email %r>' % self.email
 
 
+class Friends(db.Model):
+    __tablename__ = 'friends'
+    id = db.Column(db.Integer, primary_key=True)
+    friend1 = db.Column(db.String(50), index=True, unique=False)
+    friend2 = db.Column(db.String(50), index=True, unique=False)
+
+    def __init__(self, friend1, friend2):
+        self.friend1 = friend1
+        self.friend2 = friend2
+
+    def __repr__(self):
+        return '<Friend %r>' % self.friend1
+
+
+class Actor_Movie_Title(db.Model):
+    id= db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), index=True, unique=False)
+    movie = db.Column(db.String(100), index=True, unique=False)
+
+    def __init__(self, name, movie):
+        self.name = name
+        self.movie = movie
+
+    def __repr__(self):
+        return '<Name %r>' % self.name
+
+
 class Movie(db.Model):
     movieID = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(128), index=True, unique=False)
+    genre = db.Column(db.String(30), index=True, unique=False)
+    releaseDate = db.Column(db.String(130), index=True, unique=False)
 
-    def __init__(self, title):
+    def __init__(self, title, genre, releaseDate):
         self.title = title
+        self.releaseDate = releaseDate
+        self.genre = genre
 
     def __repr__(self):
-        return '<Data %r>' % self.notes
+        return '<Title %r>' % self.title
 
 
 class Data(db.Model):

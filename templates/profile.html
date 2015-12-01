@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <div class="container">
+    <div class="jumbotron" align="center">
+
+<h3 align="center" id="filmstr" style="font-size:40px; color:black; margin-top:-20px">{{ user.firstName }} {{ user.lastName }}</h3>
+<h5>{{ user.email }}</h5>
+<div class="container">
+
+    {% if session.username != user.email %}
+    <a href="/profile/" class="btn btn-default" role="button">View movies you both like</a>
+    <a href="/profile/" class="btn btn-default" role="button">View actors you both like</a>
+{% endif %}
+
+<ul class="nav nav-pills">
+  <li class="active"><a href="#moviesTab" data-toggle="tab">Movies</a></li>
+  <li><a href="#actorsTab" data-toggle="pill">Actors</a></li>
+
+</ul>
+<div class="tab-content">
+        <div class="tab-pane active" id="moviesTab">
+            <h4>My Favorite Movies List</h4>
+            <p>Use the search bar at the top to find new favorite movies.</p>
+        </div>
+        <div class="tab-pane" id="actorsTab">
+            <h4>My Favorite Actors List</h4>
+            <p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames
+                ac turpis egestas.</p>
+        </div>
+
+
+
+
+</div><!-- tab content -->
+</div><!-- end of container -->
+
+
+</div>
+</div>
+
+
+{% endblock %}
+
+
+

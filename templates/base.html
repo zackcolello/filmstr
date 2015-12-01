@@ -2,34 +2,40 @@
 
 <html>
   <head>
-
+        <title>filmstr - a movie social networking site</title>
       <!-- website icon -->
       <link rel="shortcut icon" type="image/png" href="/static/images/filmstriconwhite.png"/>
 
       <!-- jQuery library -->
       <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 
-      <!-- tubular -->
-      <script src="/static/plugins/js/jquery.tubular.1.0.js"></script>
-      <script src="/static/plugins/js/index.js"></script>
 
       <!-- Bootstrap -->
       <script src="/static/plugins/js/bootstrap.js"></script>
       <link href="/static/plugins/css/bootstrap.css" rel="stylesheet">
 
-      <!-- Typeahead -->
-      <script src="/static/plugins/js/typeahead.js"></script>
-
      <!-- Google fonts -->
       <link href='https://fonts.googleapis.com/css?family=Lobster' rel='stylesheet' type='text/css'>
+
+
+      <!-- tubular -->
+      <script src="/static/plugins/js/jquery.tubular.1.0.js"></script>
+
+
+       <!-- Typeahead -->
+      <script src="/static/plugins/js/typeahead.js"></script>
 
       <!-- Local stylesheets and js -->
       <link href="/static/plugins/css/main.css" rel="stylesheet">
       <script src="/static/plugins/js/main.js"></script>
 
+
+
+
   </head>
 
   <body>
+
   <div id="wrapper" class="clearfix">
   <nav class="navbar navbar-inverse">
     <div class="navbar-header">
@@ -42,21 +48,13 @@
     </div>
     <div class="collapse navbar-collapse" id="myNavbar">
       <ul class="nav navbar-nav">
-        <li class="active"><a href="/">Home</a></li>
         <li class="dropdown">
-          <a class="dropdown-toggle" data-toggle="dropdown" href="#">Movies<span class="caret"></span></a>
-          <ul class="dropdown-menu">
-            <li><a href="#">All Genres</a></li>
-            <li><a href="#">Action</a></li>
-            <li><a href="#">Adventure</a></li>
-              <li><a href="#">Fantasy</a></li>
-              <li><a href="#">Horror</a></li>
-          </ul>
+          <a class="active" href="#">My Movies</a>
         </li>
 
 
-        <li><a href="#">Actors</a></li>
-        <li><a href="#">Sessions</a></li>
+        <li><a href="#">My Actors</a></li>
+        <li><a href="#">My Friends</a></li>
       </ul>
 
 
@@ -80,6 +78,7 @@
         </li>
 
             {% if session.logged_in %}
+            <li><a href="/profile/{% print session.username %}"> Welcome, {% print session.firstName %}</a></li>
             <li><a href="/logout"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
 
             {% else %}
