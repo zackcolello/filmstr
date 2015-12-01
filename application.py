@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from application import db
 from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String
-from application.models import Users, Friends, Actor_Movie_Title
+from application.models import Users, Friends, Actor_Movie_Title, movie_lists
 from application.forms import EnterDBInfo, RetrieveDBInfo, RegistrationForm
 from functools import wraps
 from sqlalchemy.orm import Load
@@ -83,34 +83,73 @@ def profile(username):
 
     return render_template('profile.html', user=user)
 
+@login_required
+@application.route('/deletemovie/<movieID>', methods=['DELETE', 'POST', 'GET'])
+def deletemovie(movieID):
+
+    # Redirect to index if not logged in
+
+    if 'logged_in' not in session:
+        return redirect(url_for('index'))
+
+    # Get friends list
+    metadata = MetaData(bind=engine)
+    #movie = Table('movie', metadata, autoload=True)
+    #movie_lists = Table('movie_lists', metadata, autoload=True)
+
+    #movie_lists.select(movie_lists.c.movieID == movieID).execute()
+
+    movie_lists.query.filter_by(movieID=movieID).delete()
+    db.session.commit()
+    db.session.close()
+
+    return redirect(url_for('mymovies'))
 
 @login_required
-@application.route('/deletefriend/', methods=['POST'])
-def deletefriend():
+@application.route('/deletefriend/<potentialfriend>', methods=['DELETE', 'POST', 'GET'])
+def deletefriend(potentialfriend):
     # Get friends list
     metadata = MetaData(bind=engine)
     friends = Table('friends', metadata, autoload=True)
     users = Table('users', metadata, autoload=True)
 
-    if request.form.get('friendName', None) is not None:
-        friendsearch = request.form.get('friendName', None)
-        potentialfriend = users.select(users.c.email == friendsearch).execute().first()
+    potentialfriend1 = users.select(users.c.email == potentialfriend).execute().first
 
-        if potentialfriend is not None:
+    if potentialfriend is not None:
 
-            newfriendship = Friends(friend1=session['username'], friend2=potentialfriend['email'])
-            newfriendship2 = Friends(friend1=potentialfriend['email'], friend2=session['username'])
+            #newfriendship = friends(friend1=session['username'], friend2=potentialfriend['email'])
+            #newfriendship2 = friends(friend1=potentialfriend['email'], friend2=session['username'])
+
+            myfriends = friends.select(friends.c.friend1 == session['username']).execute()
+            myfriendsfriends = friends.select(friends.c.friend1 == potentialfriend).execute()
+
+            newfriendship1 = None
+            newfriendship2 = None
+
+            for o in myfriends:
+                if o[1] == potentialfriend:
+                    newfriendship1 = o[2]
+                    break
+
+            for p in myfriendsfriends:
+                if p[1] == session['username']:
+                    newfriendship2 = p[2]
+                    break
 
             try:
-                db.session.remove(newfriendship)
-                db.session.remove(newfriendship2)
+
+                Friends.query.filter_by(id=newfriendship2).delete()
+                db.session.commit()
+                db.session.close()
+
+                Friends.query.filter_by(id=newfriendship1).delete()
                 db.session.commit()
                 db.session.close()
 
             except Exception as e:
                 db.session.rollback()
 
-    return redirect(url_for('home'))
+    return redirect(url_for('myfriends'))
 
 
 
@@ -141,7 +180,7 @@ def addfriend():
             except Exception as e:
                 db.session.rollback()
 
-    return redirect(url_for('home'))
+    return redirect(url_for('myfriends'))
 
 
 @login_required
@@ -149,22 +188,10 @@ def addfriend():
 @application.route('/home', methods=['GET', 'POST'])
 def home():
 
-    #json parsing
-
     # Get friends list
     metadata = MetaData(bind=engine)
     movies = Table('movie', metadata, autoload=True)
 
-    '''m = movies.select(movies).execute()
-
-    movieArr = []
-
-    for o in m:
-        movieArr.append("\"" + o['title'].strip('"\'') + "\"")
-
-    f1=open('./movies.json', 'w+')
-    return movieArr.__str__()
-'''
     # Redirect to index if not logged in
 
     if 'logged_in' not in session:
@@ -268,6 +295,66 @@ def movie(movieID):
 
 
     return render_template('movie.html', movie=movie, actors=actors)
+
+
+@application.route('/mymovies', methods=['GET', 'POST'])
+def mymovies():
+
+    # Get movies list
+    metadata = MetaData(bind=engine)
+    movies = Table('movie', metadata, autoload=True)
+
+    # Redirect to index if not logged in
+
+    if 'logged_in' not in session:
+        return redirect(url_for('index'))
+
+    movie = Table('movie', metadata, autoload=True)
+    movie_lists = Table('movie_lists', metadata, autoload=True)
+
+    # Get movies list
+    ml = movie_lists.select(movie_lists.c.username == session['username']).execute()
+
+    movieIDArray = []
+    for object in ml:
+        movieIDArray.append(object['movieID'])
+
+    moviesList = []
+    for object in movieIDArray:
+        moviesList += db.session.query(movies).filter(movies.c.movieID == object)
+
+    if 'logged_in' not in session:
+        return redirect(url_for('index'))
+
+    return render_template('mymovies.html', movies=moviesList)
+
+
+@application.route('/myfriends', methods=['GET', 'POST'])
+def myfriends():
+
+    # Get friends list
+
+    # Redirect to index if not logged in
+
+    if 'logged_in' not in session:
+        return redirect(url_for('index'))
+
+    # Get friends list
+    metadata = MetaData(bind=engine)
+    friends = Table('friends', metadata, autoload=True)
+    users = Table('users', metadata, autoload=True)
+
+    r = friends.select(friends.c.friend1 == session['username']).execute()
+
+    friendArray = []
+    for object in r:
+        friendArray.append(object['friend2'])
+
+    friends = []
+    for object in friendArray:
+        friends += db.session.query(users).filter(users.c.email == object)
+
+    return render_template('myfriends.html', friends=friends)
 
 
 @application.route('/index', methods=['GET', 'POST'])
