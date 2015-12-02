@@ -48,34 +48,18 @@
     </div>
     <div class="collapse navbar-collapse" id="myNavbar">
       <ul class="nav navbar-nav">
-        <li class="dropdown">
-          <a class="active" href="/mymovies">My Movies</a>
-        </li>
 
-
-        <li><a href="/myactors">My Actors</a></li>
-        <li><a href="/myfriends">My Friends</a></li>
+            {% if session.logged_in %}
+            <li><a class="active" href="/mymovies">My Movies</a></li>
+            <li><a href="/myactors">My Actors</a></li>
+            <li><a href="/myfriends">My Friends</a></li>
+          {% else %}
+            <li><a href="/">Home</a></li>
+          {% endif %}
       </ul>
 
 
       <ul class="nav navbar-nav navbar-right">
-
-        <li>
-            <form class="navbar-form">
-                <div class="form-group" style="display:inline;">
-                    <div class="input-group">
-                        <form method="post" action="/index" id="moviesearch" name="moviesearch">
-                            <input class="form-control searchBar" type="text" placeholder="Search Movies">
-                            <span class="input-group-addon">
-                                <span type="submit" class="glyphicon glyphicon-search"></span>
-                            </span>
-                        </form>
-                    </div>
-
-
-                </div>
-            </form>
-        </li>
 
             {% if session.logged_in %}
             <li><a href="/profile/{% print session.username %}"> Welcome, {% print session.firstName %}</a></li>
@@ -90,6 +74,9 @@
     </div>
 
 </nav>
+
+
+
 
       {% block content %}
       {% endblock %}

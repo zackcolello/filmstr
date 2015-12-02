@@ -10,8 +10,8 @@
 <div class="container">
 
     {% if session.username != user.email %}
-    <a href="/profile/" class="btn btn-default" role="button">View movies you both like</a>
-    <a href="/profile/" class="btn btn-default" role="button">View actors you both like</a>
+    <a href="/viewSimilarMovies/{{ user.email }}" class="btn btn-default" role="button">View movies you both like</a>
+    <a href="/viewSimilarActors/{{ user.email }}" class="btn btn-default" role="button">View actors you both like</a>
 {% endif %}
 
 <ul class="nav nav-pills">
@@ -21,13 +21,69 @@
 </ul>
 <div class="tab-content">
         <div class="tab-pane active" id="moviesTab">
-            <h4>My Favorite Movies List</h4>
-            <p>Use the search bar at the top to find new favorite movies.</p>
+            <h4>{{ user.firstName }}'s favorite movies</h4>
+           <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Release Date</th>
+                    <th>Genre</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in movies %}
+                    <tr>
+                        <td>{{ item.title }}</td>
+                        <td>{{ item.releasDate }}</td>
+                        <td>{{ item.genre }}</td>
+                        <td>
+                            <a href="/movie/{{ item.movieID }}" class="btn btn-default" role="button">View Movie</a>
+                        </td>
+
+
+                        {% if session.username == user.email %}
+                        <td>
+                            <a href="/deletemovie/{{ item.movieID }}" class="btn btn-default" role="button"><span class="glyphicon glyphicon-remove"></span></a>
+                        </td>
+                        {% endif %}
+
+                    </tr>
+
+                {% endfor %}
+
+             </tbody>
+        </table>
+
+
+
         </div>
         <div class="tab-pane" id="actorsTab">
-            <h4>My Favorite Actors List</h4>
-            <p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames
-                ac turpis egestas.</p>
+            <h4>{{ user.firstName }}'s favorite actors</h4>
+                <!-- Actor table -->
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in actors %}
+                    <tr>
+                        <td>{{ item.actorName }}</td>
+
+                        {% if session.username == user.email %}
+                        <td>
+                            <a href="/deleteactor/{{ item.actorName }}" class="btn btn-default" role="button"><span class="glyphicon glyphicon-remove"></span></a>
+                        </td>
+                        {% endif %}
+                    </tr>
+
+                {% endfor %}
+
+             </tbody>
+        </table>
         </div>
 
 

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+  <div class="container">
+    <div class="jumbotron" align="center">
+
+<h3 align="center" id="filmstr" style="font-size:40px; color:black; margin-top:-20px">Movies {{ username }} and I both like</h3>
+
+<div class="container">
+<br>
+
+<table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Release Date</th>
+                    <th>Genre</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in movies %}
+                    <tr>
+                        <td>{{ item.title }}</td>
+                        <td>{{ item.releaseDate }}</td>
+                        <td>{{ item.genre }}</td>
+                        <td>
+                            <a href="/movie/{{ item['movieID']}}" class="btn btn-default" role="button">View</a>
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+             </tbody>
+        </table>
+
+
+</div><!-- tab content -->
+</div><!-- end of container -->
+
+
+</div>
+</div>
+
+
+{% endblock %}
+
+
+

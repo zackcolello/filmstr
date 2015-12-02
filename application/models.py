@@ -1,5 +1,5 @@
 from application import db
-
+from sqlalchemy import distinct
 
 class Users(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -43,17 +43,29 @@ class movie_lists(db.Model):
         return '<ID %r>' % self.movieListID
 
 
-class Actor_Movie_Title(db.Model):
+class actor_movie_title(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), index=True, unique=False)
-    movie = db.Column(db.String(100), index=True, unique=False)
+    Name = db.Column(db.String(100), index=True, unique=False)
+    Movie = db.Column(db.String(100), index=True, unique=False)
 
-    def __init__(self, name, movie):
-        self.name = name
-        self.movie = movie
+    def __init__(self, Name, Movie):
+        self.Name = Name
+        self.Movie = Movie
 
     def __repr__(self):
-        return '<Name %r>' % self.name
+        return '<Name %r>' % self.Name
+
+class actor_lists(db.Model):
+    actorListID = db.Column(db.Integer, primary_key=True)
+    actorName = db.Column(db.String(100), index=True, unique=False)
+    username = db.Column(db.String(100), index=True, unique=False)
+
+    def __init__(self, actorName, username):
+        self.actorName = actorName
+        self.username = username
+
+    def __repr__(self):
+        return '<Name %r>' % self.actorName
 
 
 class Movie(db.Model):

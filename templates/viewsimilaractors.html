@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+  <div class="container">
+    <div class="jumbotron" align="center">
+
+<h3 align="center" id="filmstr" style="font-size:40px; color:black; margin-top:-20px">Actors {{ username }} and I both like</h3>
+
+<div class="container">
+<br>
+
+<table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>name</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in actors %}
+                    <tr>
+                        <td>{{ item['actorName'] }}</td>
+                    </tr>
+                {% endfor %}
+
+             </tbody>
+        </table>
+
+
+</div><!-- tab content -->
+</div><!-- end of container -->
+
+
+</div>
+</div>
+
+
+{% endblock %}
+
+
+

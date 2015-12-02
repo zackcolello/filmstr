@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from application import db
 from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String
-from application.models import Users, Friends, Actor_Movie_Title, movie_lists
+from application.models import Users, Friends, actor_movie_title, movie_lists, Movie, actor_lists
 from application.forms import EnterDBInfo, RetrieveDBInfo, RegistrationForm
 from functools import wraps
 from sqlalchemy.orm import Load
@@ -43,7 +43,8 @@ def login():
                 session['username'] = r['email']
                 session['firstName'] = r['firstName']
 
-                return redirect(url_for('home'))
+                return render_template('mymovies.html', loginsuccess="true")
+
 
             else:
                 error = "Invalid Credentials. Try again."
@@ -80,8 +81,91 @@ def profile(username):
     users = Table('users', metadata, autoload=True)
 
     user = db.session.query(users).filter(users.c.email == username).first()
+    moviesID = movie_lists.query.with_entities(movie_lists.movieID).filter(movie_lists.username.like(username)).all()
+    actors = actor_lists.query.with_entities(actor_lists.actorName).filter(actor_lists.username.like(username)).all()
 
-    return render_template('profile.html', user=user)
+    myMovieArray = []
+
+    for m in moviesID:
+        myMovieArray.append(m[0])
+
+    returnMov = Movie.query.filter(Movie.movieID.in_(myMovieArray)).all()
+
+
+    return render_template('profile.html', user=user, movies=returnMov, actors=actors)
+
+
+@application.route('/viewSimilarMovies/<username>', methods=['POST', 'GET'])
+def viewSimilarMovies(username):
+
+    movies = movie_lists.query.with_entities(movie_lists.movieID).filter(movie_lists.username.like(username)).all()
+    myMovies = movie_lists.query.with_entities(movie_lists.movieID).filter(movie_lists.username.like(session['username'])).all()
+
+    movieIntersect = set(movies).intersection(myMovies)
+
+    myMovieArray = []
+
+    for m in movieIntersect:
+        myMovieArray.append(m[0])
+
+    returnMov = Movie.query.filter(Movie.movieID.in_(myMovieArray)).all()
+
+    return render_template('viewsimilarmovies.html', username=username, movies=returnMov)
+
+
+@application.route('/viewSimilarActors/<username>', methods=['POST', 'GET'])
+def viewSimilarActors(username):
+
+    actors = actor_lists.query.with_entities(actor_lists.actorName).filter(actor_lists.username.like(username)).all()
+    myActors = actor_lists.query.with_entities(actor_lists.actorName).filter(movie_lists.username.like(session['username'])).all()
+
+    actorIntersect = set(actors).intersection(myActors)
+
+    return render_template('viewsimilaractors.html', username=username, movies=actorIntersect)
+
+@application.route('/searchactor/', methods=['POST', 'GET'])
+def searchactor():
+
+    actors = ''
+
+    if request.form.get('actorSearch', None) is not None:
+        queryName = request.form.get('actorSearch', None)
+
+        actors = actor_movie_title.query.filter(actor_movie_title.Name.like('%' + queryName + '%')).limit(1).distinct(actor_movie_title.Name).all()
+
+    return render_template('searchactor.html', actors=actors)
+
+
+@application.route('/searchmovie/', methods=['POST', 'GET'])
+def searchmovie():
+
+    movies = None
+
+    if request.form.get('movieSearch', None) is not None:
+        queryTitle = request.form.get('movieSearch', None)
+
+        metadata = MetaData(bind=engine)
+        movies = Movie.query.filter(Movie.title.like('%' + queryTitle + '%')).all()
+
+
+    return render_template('searchmovie.html', movies=movies)
+
+
+
+@login_required
+@application.route('/deleteactor/<actorName>', methods=['DELETE', 'POST', 'GET'])
+def deleteactor(actorName):
+     # Redirect to index if not logged in
+
+    if 'logged_in' not in session:
+        return redirect(url_for('index'))
+
+    actor_lists.query.filter_by(actorName=actorName).delete()
+    db.session.commit()
+    db.session.close()
+
+    return redirect(url_for('myactors'))
+
 
 @login_required
 @application.route('/deletemovie/<movieID>', methods=['DELETE', 'POST', 'GET'])
@@ -91,13 +175,6 @@ def deletemovie(movieID):
 
     if 'logged_in' not in session:
         return redirect(url_for('index'))
-
-    # Get friends list
-    metadata = MetaData(bind=engine)
-    #movie = Table('movie', metadata, autoload=True)
-    #movie_lists = Table('movie_lists', metadata, autoload=True)
-
-    #movie_lists.select(movie_lists.c.movieID == movieID).execute()
 
     movie_lists.query.filter_by(movieID=movieID).delete()
     db.session.commit()
@@ -152,6 +229,52 @@ def deletefriend(potentialfriend):
     return redirect(url_for('myfriends'))
 
 
+@login_required
+@application.route('/addactor/<actorName>', methods=['GET', 'POST'])
+def addactor(actorName):
+    metadata = MetaData(bind=engine)
+    al = Table('actor_lists', metadata, autoload=True)
+
+    newActorListItem = actor_lists(username=session['username'], actorName=actorName)
+
+    # Check if actor exists
+    potentialactor = al.select(al.c.username == session['username']).execute()
+
+    for o in potentialactor:
+        if o['actorName'] == actorName:
+            return redirect(url_for('myactors'))
+
+    db.session.add(newActorListItem)
+    db.session.commit()
+    db.session.close()
+
+    return redirect(url_for('myactors'))
+
+@login_required
+@application.route('/addmovie/<movieID>', methods=['GET', 'POST'])
+def addmovie(movieID):
+
+    metadata = MetaData(bind=engine)
+    ml = Table('movie_lists', metadata, autoload=True)
+    # newMovie = movie_lists(username=session['username'], movieID=movieID)
+
+    movieToBeAdded = Movie.query.filter(Movie.movieID.like(movieID)).first()
+
+    newMovieListItem = movie_lists(username=session['username'], movieID=movieToBeAdded.movieID)
+
+    # Check if movie exists
+    potentialmovie = ml.select(ml.c.username == session['username']).execute()
+
+    for o in potentialmovie:
+        if o['movieID'] == movieID:
+            return redirect(url_for('mymovies'))
+
+    db.session.add(newMovieListItem)
+    db.session.commit()
+    db.session.close()
+
+    return redirect(url_for('mymovies'))
+
 
 @login_required
 @application.route('/addfriend/', methods=['POST'])
@@ -184,7 +307,6 @@ def addfriend():
 
 
 @login_required
-@application.route('/', methods=['GET', 'POST'])
 @application.route('/home', methods=['GET', 'POST'])
 def home():
 
@@ -266,7 +388,7 @@ def signup():
                 session['logged_in'] = True
                 session['username'] = username
                 session['firstName'] = firstName
-                return render_template('home.html')
+                return render_template('mymovies.html')
 
             except Exception as e:
                 db.session.rollback()
@@ -284,20 +406,28 @@ def signup():
 def movie(movieID):
 
     # Get movie
-    metadata = MetaData(bind=engine)
-    movies = Table('movie', metadata, autoload=True)
-    amt = Table('actor_movie_title', metadata, autoload=True)
-
-    movie = movies.select(movies.c.movieID == movieID).execute().first()
-    title = movie['title']
-
-    actors = amt.select(amt.c.Movie == title).execute()
-
+    movie = Movie.query.filter(Movie.movieID.like(movieID)).first()
+    Str = movie.title
+    actors = actor_movie_title.query.filter(actor_movie_title.Movie.like(Str)).distinct(actor_movie_title.Name).limit(30).all()
 
     return render_template('movie.html', movie=movie, actors=actors)
 
+@login_required
+@application.route('/myactors', methods=['GET', 'POST'])
+def myactors():
+
+    # Redirect to index if not logged in
+    if 'logged_in' not in session:
+        return redirect(url_for('index'))
+
+    #  Get actors list
+    actors = actor_lists.query.filter(actor_lists.username.like(session['username'])).all()
+
+    return render_template('myactors.html', actors=actors)
+
 
 @application.route('/mymovies', methods=['GET', 'POST'])
+@application.route('/', methods=['GET', 'POST'])
 def mymovies():
 
     # Get movies list
@@ -322,9 +452,6 @@ def mymovies():
     moviesList = []
     for object in movieIDArray:
         moviesList += db.session.query(movies).filter(movies.c.movieID == object)
-
-    if 'logged_in' not in session:
-        return redirect(url_for('index'))
 
     return render_template('mymovies.html', movies=moviesList)
 
