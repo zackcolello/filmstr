@@ -27,11 +27,10 @@
             <tbody>
                 {% for item in actors %}
                     <tr>
-                        <td>{{ item.Name }}</td>
+                        <td>{{ item.name }}</td>
                         <td>
-                            <a href="/addactor/{{ item.Name }}" class="btn btn-default" role="button">Favorite</a>
+                            <a href="/addactor/{{ item.name }}" class="btn btn-default" role="button">Favorite</a>
                         </td>
-
                     </tr>
 
                 {% endfor %}

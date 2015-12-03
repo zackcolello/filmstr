@@ -41,6 +41,10 @@
                         </td>
 
 
+                        <td>
+                            <a href="/addmovie/{{ item.movieID }}" class="btn btn-default" role="button">Favorite</a>
+                        </td>
+
                         {% if session.username == user.email %}
                         <td>
                             <a href="/deletemovie/{{ item.movieID }}" class="btn btn-default" role="button"><span class="glyphicon glyphicon-remove"></span></a>
@@ -72,6 +76,12 @@
                 {% for item in actors %}
                     <tr>
                         <td>{{ item.actorName }}</td>
+
+
+                        <td>
+                            <a href="/addactor/{{ item.actorName }}" class="btn btn-default" role="button">Favorite</a>
+                        </td>
+
 
                         {% if session.username == user.email %}
                         <td>

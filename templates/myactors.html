@@ -2,6 +2,21 @@
 
 {% block content %}
 
+    {% if deletesuccess %}
+        <div class="alert alert-success alert-dismissible" role="alert" style="margin-left:65px; margin-right:65px">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <strong>Congratulations!</strong> Actor was successfully deleted.
+        </div>
+     {% endif %}
+
+        {% if addsuccess %}
+        <div class="alert alert-success alert-dismissible" role="alert" style="margin-left:65px; margin-right:65px">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <strong>Congratulations!</strong> Actor was successfully added.
+        </div>
+     {% endif %}
+
+
     <div class="container">
     <div class="jumbotron" align="center">
 <h3 align="center" id="filmstr" style="font-size:40px; color:black; margin-top:-20px">my actors</h3>

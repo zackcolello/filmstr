@@ -42,6 +42,16 @@ class movie_lists(db.Model):
     def __repr__(self):
         return '<ID %r>' % self.movieListID
 
+class actors(db.Model):
+    actorID = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), index=True, unique=False)
+
+    def __init__(self, name):
+        self.name = name
+
+    def __repr__(self):
+        return '<Name %r>' % self.Name
+
 
 class actor_movie_title(db.Model):
     id = db.Column(db.Integer, primary_key=True)

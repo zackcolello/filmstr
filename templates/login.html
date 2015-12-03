@@ -8,7 +8,7 @@
 
           <div class="container">
               <h2 class="form-signin-heading">please sign in.</h2>
-
+                <p style="color:red">{{ error }}</p>
               <form class="form form-signin" method="post" style="max-width: 300px">
 
                 <label for="inputUsername" class="sr-only">Email address</label>
@@ -19,8 +19,6 @@
 
                 <input class="btn btn-lg btn-primary btn-block" type="submit" value="Login">
               </form>
-
-              <p>{{ error }}</p>
 
               <br/><br/><hr/>
               Don't have an account yet?

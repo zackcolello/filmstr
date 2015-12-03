@@ -1,11 +1,9 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from application import db
 from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String
-from application.models import Users, Friends, actor_movie_title, movie_lists, Movie, actor_lists
+from application.models import Users, Friends, actor_movie_title, movie_lists, Movie, actor_lists, actors
 from application.forms import EnterDBInfo, RetrieveDBInfo, RegistrationForm
 from functools import wraps
-from sqlalchemy.orm import Load
-from wtforms import Form, TextField, validators
 
 
 # Elastic Beanstalk initialization
@@ -35,7 +33,7 @@ def login():
 
             if r['pw'] != attempted_password:
                 error = "Invalid Password. Try again."
-                return render_template('signup.html', error=error)
+                return render_template('login.html', error=error)
 
             if r is not None:
 
@@ -43,8 +41,23 @@ def login():
                 session['username'] = r['email']
                 session['firstName'] = r['firstName']
 
-                return render_template('mymovies.html', loginsuccess="true")
+                # Get movies list
+                metadata = MetaData(bind=engine)
+                movies = Table('movie', metadata, autoload=True)
+                movie_lists = Table('movie_lists', metadata, autoload=True)
 
+                # Get movies list
+                ml = movie_lists.select(movie_lists.c.username == session['username']).execute()
+
+                movieIDArray = []
+                for object in ml:
+                    movieIDArray.append(object['movieID'])
+
+                moviesList = []
+                for object in movieIDArray:
+                    moviesList += db.session.query(movies).filter(movies.c.movieID == object)
+
+                return render_template('mymovies.html', movies=moviesList, loginsuccess="true")
 
             else:
                 error = "Invalid Credentials. Try again."
@@ -52,6 +65,7 @@ def login():
         return render_template('login.html', error=error)
 
     except Exception as e:
+        error='Invalid credentials. Try again.'
         return render_template("login.html", error=error)
 
 
@@ -126,14 +140,14 @@ def viewSimilarActors(username):
 @application.route('/searchactor/', methods=['POST', 'GET'])
 def searchactor():
 
-    actors = ''
+    actorlist = ''
 
     if request.form.get('actorSearch', None) is not None:
         queryName = request.form.get('actorSearch', None)
 
-        actors = actor_movie_title.query.filter(actor_movie_title.Name.like('%' + queryName + '%')).limit(1).distinct(actor_movie_title.Name).all()
+        actorlist = actors.query.filter(actors.name.like('%' + queryName + '%')).limit(30).all()
 
-    return render_template('searchactor.html', actors=actors)
+    return render_template('searchactor.html', actors=actorlist)
 
 
 @application.route('/searchmovie/', methods=['POST', 'GET'])
@@ -164,7 +178,10 @@ def deleteactor(actorName):
     db.session.commit()
     db.session.close()
 
-    return redirect(url_for('myactors'))
+    #  Get actors list
+    actors = actor_lists.query.filter(actor_lists.username.like(session['username'])).all()
+
+    return render_template('myactors.html', actors=actors, deletesuccess="true")
 
 
 @login_required
@@ -180,7 +197,23 @@ def deletemovie(movieID):
     db.session.commit()
     db.session.close()
 
-    return redirect(url_for('mymovies'))
+        # Get movies list
+    metadata = MetaData(bind=engine)
+    movies = Table('movie', metadata, autoload=True)
+    movielist = Table('movie_lists', metadata, autoload=True)
+
+    # Get movies list
+    ml = movielist.select(movielist.c.username == session['username']).execute()
+
+    movieIDArray = []
+    for object in ml:
+        movieIDArray.append(object['movieID'])
+
+    moviesList = []
+    for object in movieIDArray:
+        moviesList += db.session.query(movies).filter(movies.c.movieID == object)
+
+    return render_template('mymovies.html', movies=moviesList, deletesuccess="true")
 
 @login_required
 @application.route('/deletefriend/<potentialfriend>', methods=['DELETE', 'POST', 'GET'])
@@ -248,7 +281,10 @@ def addactor(actorName):
     db.session.commit()
     db.session.close()
 
-    return redirect(url_for('myactors'))
+        #  Get actors list
+    actors = actor_lists.query.filter(actor_lists.username.like(session['username'])).all()
+
+    return render_template('myactors.html', actors=actors, addsuccess="true")
 
 @login_required
 @application.route('/addmovie/<movieID>', methods=['GET', 'POST'])
@@ -273,7 +309,23 @@ def addmovie(movieID):
     db.session.commit()
     db.session.close()
 
-    return redirect(url_for('mymovies'))
+    # Get movies list
+    metadata = MetaData(bind=engine)
+    movies = Table('movie', metadata, autoload=True)
+    movielist = Table('movie_lists', metadata, autoload=True)
+
+    # Get movies list
+    ml = movielist.select(movielist.c.username == session['username']).execute()
+
+    movieIDArray = []
+    for object in ml:
+        movieIDArray.append(object['movieID'])
+
+    moviesList = []
+    for object in movieIDArray:
+        moviesList += db.session.query(movies).filter(movies.c.movieID == object)
+
+    return render_template('mymovies.html', movies=moviesList, addsuccess="true")
 
 
 @login_required
@@ -388,7 +440,7 @@ def signup():
                 session['logged_in'] = True
                 session['username'] = username
                 session['firstName'] = firstName
-                return render_template('mymovies.html')
+                return render_template('mymovies.html', loginsuccess="true")
 
             except Exception as e:
                 db.session.rollback()
@@ -406,11 +458,11 @@ def signup():
 def movie(movieID):
 
     # Get movie
-    movie = Movie.query.filter(Movie.movieID.like(movieID)).first()
-    Str = movie.title
-    actors = actor_movie_title.query.filter(actor_movie_title.Movie.like(Str)).distinct(actor_movie_title.Name).limit(30).all()
 
-    return render_template('movie.html', movie=movie, actors=actors)
+    movie1 = Movie.query.with_entities(Movie.title, Movie.genre, Movie.movieID).filter(Movie.movieID.like(movieID)).first()
+    Str = movie1[0]
+    actors = actor_movie_title.query.filter(actor_movie_title.Movie.like(Str)).limit(30).all()
+    return render_template('movie.html', movie=movie1, actors=actors)
 
 @login_required
 @application.route('/myactors', methods=['GET', 'POST'])
