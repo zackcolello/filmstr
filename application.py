@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from application import db
 from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String
 from application.models import Users, Friends, actor_movie_title, movie_lists, Movie, actor_lists, actors
-from application.forms import EnterDBInfo, RetrieveDBInfo, RegistrationForm
+from application.forms import RegistrationForm
 from functools import wraps
 
 # Elastic Beanstalk initialization
