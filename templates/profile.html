@@ -10,8 +10,8 @@
 <div class="container">
 
     {% if session.username != user.email %}
-    <a href="/viewSimilarMovies/{{ user.email }}" class="btn btn-default" role="button">View movies you both like</a>
-    <a href="/viewSimilarActors/{{ user.email }}" class="btn btn-default" role="button">View actors you both like</a>
+    <a href="/viewSimilarMovies/{{ user.email }}" class="btn btn-default" role="button"><span class="glyphicon glyphicon-eye-open"></span> View movies you both like</a>
+    <a href="/viewSimilarActors/{{ user.email }}" class="btn btn-default" role="button"><span class="glyphicon glyphicon-eye-open"></span> View actors you both like</a>
 {% endif %}
 
 <ul class="nav nav-pills">
@@ -22,6 +22,8 @@
 <div class="tab-content">
         <div class="tab-pane active" id="moviesTab">
             <h4>{{ user.firstName }}'s favorite movies</h4>
+
+            {% if movies|length > 0 %}
            <table class="table table-striped">
             <thead>
                 <tr>
@@ -34,16 +36,17 @@
                 {% for item in movies %}
                     <tr>
                         <td>{{ item.title }}</td>
-                        <td>{{ item.releasDate }}</td>
+                        <td>{{ item.releaseDate }}</td>
                         <td>{{ item.genre }}</td>
                         <td>
-                            <a href="/movie/{{ item.movieID }}" class="btn btn-default" role="button">View Movie</a>
+                            <a href="/movie/{{ item.movieID }}" class="btn btn-default" role="button"><span class="glyphicon glyphicon-eye-open"></span> View Movie</a>
                         </td>
 
-
+                        {% if session.username != user.email %}
                         <td>
-                            <a href="/addmovie/{{ item.movieID }}" class="btn btn-default" role="button">Favorite</a>
+                            <a href="/addmovie/{{ item.movieID }}" class="btn btn-default" role="button"><span class="glyphicon glyphicon-star"></span> Favorite</a>
                         </td>
+                        {% endif %}
 
                         {% if session.username == user.email %}
                         <td>
@@ -57,30 +60,46 @@
 
              </tbody>
         </table>
-
-
+        {% else %}
+            <br><br><p>{{ user.firstName }} doesn't have any favorite movies yet.</p>
+        {% endif %}
 
         </div>
         <div class="tab-pane" id="actorsTab">
             <h4>{{ user.firstName }}'s favorite actors</h4>
                 <!-- Actor table -->
-
+        {% if actors|length > 0 %}
         <table class="table table-striped">
             <thead>
                 <tr>
                     <th>Name</th>
                     <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+
                 </tr>
             </thead>
             <tbody>
                 {% for item in actors %}
                     <tr>
                         <td>{{ item.actorName }}</td>
-
-
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
                         <td>
-                            <a href="/addactor/{{ item.actorName }}" class="btn btn-default" role="button">Favorite</a>
+                            <a href="/actor/{{ item.actorName }}" class="btn btn-default" role="button"><span class="glyphicon glyphicon-eye-open"></span> View Actor</a>
                         </td>
+
+
+                        {% if session.username != user.email %}
+                        <td>
+                            <a href="/addactor/{{ item.actorName }}" class="btn btn-default" role="button"><span class="glyphicon glyphicon-star"></span> Favorite</a>
+                        </td>
+                        {% endif %}
 
 
                         {% if session.username == user.email %}
@@ -94,6 +113,10 @@
 
              </tbody>
         </table>
+
+        {% else %}
+            <br><br><p>{{ user.firstName }} doesn't have any favorite actors yet.</p>
+        {% endif %}
         </div>
 
 

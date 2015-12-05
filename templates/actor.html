@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="container">
+    <div class="jumbotron" align="center">
+
+<h3 align="center" id="filmstr" style="font-size:40px; color:black; margin-top:-20px">{{ actor }}</h3>
+        <a href="/addactor/{{ actor }}" class="btn btn-default" role="button"><span class="glyphicon glyphicon-star"></span> Favorite</a>
+
+<div class="container">
+<br>
+<h4>Movies</h4>
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Movie</th>
+                    <th>Release Date</th>
+                    <th>Genre</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+
+                {% for item in movies %}
+                    <tr>
+                        <td>{{ item.title }}</td>
+                    <td>{{ item.releaseDate }}</td>
+                    <td>{{ item.genre }}</td>
+                        <td>
+                            <a href="/movie/{{ item.movieID }}" class="btn btn-default" role="button"><span class="glyphicon glyphicon-eye-open"></span> View Movie</a>
+                        </td>
+                    <td>
+                        <a href="/addmovie/{{ item.movieID }}" class="btn btn-default" role="button"><span class="glyphicon glyphicon-star"></span> Favorite</a>
+                    </td>
+                    </tr>
+                {% endfor %}
+
+             </tbody>
+        </table>
+        </div>
+
+
+
+
+</div><!-- tab content -->
+</div><!-- end of container -->
+
+
+</div>
+</div>
+
+
+{% endblock %}

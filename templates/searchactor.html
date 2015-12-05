@@ -22,6 +22,7 @@
                 <tr>
                     <th>Name</th>
                     <th></th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -29,7 +30,10 @@
                     <tr>
                         <td>{{ item.name }}</td>
                         <td>
-                            <a href="/addactor/{{ item.name }}" class="btn btn-default" role="button">Favorite</a>
+                            <a href="/actor/{{ item.name }}" class="btn btn-default" role="button"><span class="glyphicon glyphicon-eye-open"></span> View Actor</a>
+                        </td>
+                        <td>
+                            <a href="/addactor/{{ item.name }}" class="btn btn-default" role="button"><span class="glyphicon glyphicon-star"></span> Favorite</a>
                         </td>
                     </tr>
 

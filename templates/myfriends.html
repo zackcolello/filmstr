@@ -2,12 +2,34 @@
 
 {% block content %}
 
+
+    {% if addsuccess %}
+        <div class="alert alert-success alert-dismissible" role="alert" style="margin-left:65px; margin-right:65px">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <strong>Congratulations!</strong> Successfully logged in.
+        </div>
+     {% endif %}
+
+    {% if addfailure %}
+        <div class="alert alert-danger alert-dismissible" role="alert" style="margin-left:65px; margin-right:65px">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <strong>Sorry!</strong> A user does not exist with that username.
+        </div>
+     {% endif %}
+
+    {% if alreadyaddedfriendfailure %}
+        <div class="alert alert-warning alert-dismissible" role="alert" style="margin-left:65px; margin-right:65px">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            You are already friends with that user!
+        </div>
+     {% endif %}
+
+
     <div class="container">
     <div class="jumbotron" align="center">
 
-
     <h3 align="center" id="filmstr" style="font-size:40px; color:black; margin-top:-20px">my friends</h3>
-    <br>
+
 
  <!-- Add friend -->
 
@@ -22,7 +44,7 @@
             <!-- Friends table -->
 
         <h4>My Friends</h4>
-
+        {% if friends|length > 0 %}
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -39,7 +61,7 @@
                         <td>{{ item.lastName }}</td>
                         <td>{{ item.email }}</td>
                         <td>
-                            <a href="/profile/{{ item.email }}" class="btn btn-default" role="button">View profile</a>
+                            <a href="/profile/{{ item.email }}" class="btn btn-default" role="button"><span class="glyphicon glyphicon-eye-open"></span> View profile</a>
                         </td>
 
                         <td>
@@ -56,6 +78,9 @@
 
              </tbody>
         </table>
+        {% else %}
+            <br><br><p>You don't have any friends yet. Search for your friends to get started!</p>
+        {% endif %}
 
     </div><!-- tab content -->
 </div><!-- end of container -->

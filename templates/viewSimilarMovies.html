@@ -10,6 +10,7 @@
 <div class="container">
 <br>
 
+{% if movies|length > 0 %}
 <table class="table table-striped">
             <thead>
                 <tr>
@@ -26,7 +27,7 @@
                         <td>{{ item.releaseDate }}</td>
                         <td>{{ item.genre }}</td>
                         <td>
-                            <a href="/movie/{{ item['movieID']}}" class="btn btn-default" role="button">View</a>
+                            <a href="/movie/{{ item['movieID']}}" class="btn btn-default" role="button"><span class="glyphicon glyphicon-eye-open"></span> View Movie</a>
                         </td>
                     </tr>
                 {% endfor %}
@@ -34,6 +35,11 @@
              </tbody>
         </table>
 
+{% else %}
+            <br><br><p>You don't have any favorite movies in common with {{ username }}. Check out what movies they like to add them!</p>
+{% endif %}
+
+            <a href="/profile/{{ username }}" class="btn btn-default" role="button">Back</a>
 
 </div><!-- tab content -->
 </div><!-- end of container -->

@@ -5,7 +5,6 @@ from application.models import Users, Friends, actor_movie_title, movie_lists, M
 from application.forms import EnterDBInfo, RetrieveDBInfo, RegistrationForm
 from functools import wraps
 
-
 # Elastic Beanstalk initialization
 application = Flask(__name__)
 application.debug = True
@@ -69,11 +68,12 @@ def login():
         return render_template("login.html", error=error)
 
 
+
+
 @application.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('index'))
-
 
 
 def login_required(f):
@@ -131,11 +131,11 @@ def viewSimilarMovies(username):
 def viewSimilarActors(username):
 
     actors = actor_lists.query.with_entities(actor_lists.actorName).filter(actor_lists.username.like(username)).all()
-    myActors = actor_lists.query.with_entities(actor_lists.actorName).filter(movie_lists.username.like(session['username'])).all()
+    myActors = actor_lists.query.with_entities(actor_lists.actorName).filter(actor_lists.username.like(session['username'])).distinct().all()
 
     actorIntersect = set(actors).intersection(myActors)
 
-    return render_template('viewsimilaractors.html', username=username, movies=actorIntersect)
+    return render_template('viewsimilaractors.html', username=username, actors=actorIntersect)
 
 @application.route('/searchactor/', methods=['POST', 'GET'])
 def searchactor():
@@ -275,13 +275,19 @@ def addactor(actorName):
 
     for o in potentialactor:
         if o['actorName'] == actorName:
-            return redirect(url_for('myactors'))
+
+            # actor already exists
+
+            #  Get actors list
+            actors = actor_lists.query.filter(actor_lists.username.like(session['username'])).all()
+
+            return render_template('myactors.html', actors=actors, actoralreadyaddedfailure="true")
 
     db.session.add(newActorListItem)
     db.session.commit()
     db.session.close()
 
-        #  Get actors list
+    #  Get actors list
     actors = actor_lists.query.filter(actor_lists.username.like(session['username'])).all()
 
     return render_template('myactors.html', actors=actors, addsuccess="true")
@@ -299,11 +305,36 @@ def addmovie(movieID):
     newMovieListItem = movie_lists(username=session['username'], movieID=movieToBeAdded.movieID)
 
     # Check if movie exists
-    potentialmovie = ml.select(ml.c.username == session['username']).execute()
+    potentialMovie = movie_lists.query.filter(movie_lists.username.like(session['username'])).first()
 
-    for o in potentialmovie:
-        if o['movieID'] == movieID:
-            return redirect(url_for('mymovies'))
+    if potentialMovie is not None:
+        if potentialMovie.movieID == int(movieID):
+            # Movie already exists
+
+            # Get movies list
+            metadata = MetaData(bind=engine)
+            movies = Table('movie', metadata, autoload=True)
+
+            # Redirect to index if not logged in
+
+            if 'logged_in' not in session:
+                return redirect(url_for('index'))
+
+            movie = Table('movie', metadata, autoload=True)
+            movie_list = Table('movie_lists', metadata, autoload=True)
+
+            # Get movies list
+            ml = movie_list.select(movie_list.c.username == session['username']).execute()
+
+            movieIDArray = []
+            for object in ml:
+                movieIDArray.append(object['movieID'])
+
+            moviesList = []
+            for object in movieIDArray:
+                moviesList += db.session.query(movies).filter(movies.c.movieID == object)
+
+            return render_template('mymovies.html', movies=moviesList, moviealreadyaddedfailure="true")
 
     db.session.add(newMovieListItem)
     db.session.commit()
@@ -346,6 +377,20 @@ def addfriend():
             newfriendship = Friends(friend1=session['username'], friend2=potentialfriend['email'])
             newfriendship2 = Friends(friend1=potentialfriend['email'], friend2=session['username'])
 
+            if db.session.query(friends).filter(friends.c.friend1 == newfriendship.friend1, friends.c.friend2==newfriendship.friend2).count() > 0:
+                # User entered does not exist
+                r = friends.select(friends.c.friend1 == session['username']).execute()
+
+                friendArray = []
+                for object in r:
+                    friendArray.append(object['friend2'])
+
+                friends = []
+                for object in friendArray:
+                    friends += db.session.query(users).filter(users.c.email == object)
+
+                return render_template('myfriends.html', friends=friends, alreadyaddedfriendfailure="true")
+
             try:
                 db.session.add(newfriendship)
                 db.session.add(newfriendship2)
@@ -354,6 +399,22 @@ def addfriend():
 
             except Exception as e:
                 db.session.rollback()
+        else:
+            # User entered does not exist
+            r = friends.select(friends.c.friend1 == session['username']).execute()
+
+            friendArray = []
+            for object in r:
+                friendArray.append(object['friend2'])
+
+            friends = []
+            for object in friendArray:
+                friends += db.session.query(users).filter(users.c.email == object)
+
+            return render_template('myfriends.html', friends=friends, addfailure="true")
+
+
+
 
     return redirect(url_for('myfriends'))
 
@@ -451,6 +512,21 @@ def signup():
         return str(e)
 
     # return render_template('signup.html')
+
+
+@application.route('/actor/', methods=['GET', 'POST'])
+@application.route('/actor/<actorName>', methods=['GET', 'POST'])
+def actor(actorName):
+
+    movietitlelist = actor_movie_title.query.with_entities(actor_movie_title.Movie).filter(actor_movie_title.Name.like(actorName)).distinct().limit(30).all()
+
+    movietitles = []
+    for m in movietitlelist:
+        movietitles.append(m[0])
+
+    movies = Movie.query.filter(Movie.title.in_(movietitles)).all()
+
+    return render_template('actor.html', actor=actorName, movies=movies)
 
 
 @application.route('/movie/', methods=['GET', 'POST'])

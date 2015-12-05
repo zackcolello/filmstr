@@ -7,10 +7,10 @@
 
 <h3 align="center" id="filmstr" style="font-size:40px; color:black; margin-top:-20px">{{ movie.title }}</h3>
 <h4>{{ movie.genre }}</h4>
-        <a href="/addmovie/{{ movie.movieID }}" class="btn btn-default" role="button">Favorite</a>
+        <a href="/addmovie/{{ movie.movieID }}" class="btn btn-default" role="button"><span class="glyphicon glyphicon-star"></span> Favorite</a>
 
 <div class="container">
-
+<br>
 <h4>Actors</h4>
 
         <table class="table table-striped">
@@ -25,7 +25,10 @@
                     <tr>
                         <td>{{ item.Name }}</td>
                         <td>
-                            <a href="/addactor/{{ item.Name }}" class="btn btn-default" role="button">Favorite</a>
+                            <a href="/actor/{{ item.Name }}" class="btn btn-default" role="button"><span class="glyphicon glyphicon-eye-open"></span> View Actor</a>
+                        </td>
+                        <td>
+                            <a href="/addactor/{{ item.Name }}" class="btn btn-default" role="button"><span class="glyphicon glyphicon-star"></span> Favorite</a>
                         </td>
                     </tr>
                 {% endfor %}
