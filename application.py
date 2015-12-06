@@ -420,7 +420,6 @@ def addfriend():
 
 
 @login_required
-@application.route('/', methods=['GET', 'POST'])
 @application.route('/home', methods=['GET', 'POST'])
 def home():
 
@@ -555,6 +554,7 @@ def myactors():
     return render_template('myactors.html', actors=actors)
 
 
+@application.route('/', methods=['GET', 'POST'])
 @application.route('/mymovies', methods=['GET', 'POST'])
 def mymovies():
 
