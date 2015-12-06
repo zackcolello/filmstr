@@ -420,6 +420,7 @@ def addfriend():
 
 
 @login_required
+@application.route('/', methods=['GET', 'POST'])
 @application.route('/home', methods=['GET', 'POST'])
 def home():
 
@@ -612,7 +613,6 @@ def myfriends():
 
 
 @application.route('/index', methods=['GET', 'POST'])
-@application.route('/', methods=['GET', 'POST'])
 def index():
     return render_template('index.html')
 
