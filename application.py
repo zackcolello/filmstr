@@ -555,7 +555,6 @@ def myactors():
 
 
 @application.route('/mymovies', methods=['GET', 'POST'])
-@application.route('/', methods=['GET', 'POST'])
 def mymovies():
 
     # Get movies list
@@ -613,6 +612,7 @@ def myfriends():
 
 
 @application.route('/index', methods=['GET', 'POST'])
+@application.route('/', methods=['GET', 'POST'])
 def index():
     return render_template('index.html')
 
