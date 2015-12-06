@@ -110,7 +110,7 @@ def profile(username):
 
 
 @application.route('/viewSimilarMovies/<username>', methods=['POST', 'GET'])
-def viewSimilarMovies(username):
+def ViewSimilarMovies(username):
 
     movies = movie_lists.query.with_entities(movie_lists.movieID).filter(movie_lists.username.like(username)).all()
     myMovies = movie_lists.query.with_entities(movie_lists.movieID).filter(movie_lists.username.like(session['username'])).all()
@@ -124,7 +124,7 @@ def viewSimilarMovies(username):
 
     returnMov = Movie.query.filter(Movie.movieID.in_(myMovieArray)).all()
 
-    return render_template('viewsimilarmovies.html', username=username, movies=returnMov)
+    return render_template('viewSimilarMovies.html', username=username, movies=returnMov)
 
 
 @application.route('/viewSimilarActors/<username>', methods=['POST', 'GET'])
