@@ -1,4 +1,4 @@
-SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://zackcolello:Fmtvv22632@db.cqa9wktokxlq.us-west-2.rds.amazonaws.com:3306/db'
+SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://zcolello:filmstrpassword@filmstr.c5l6ey67qvdf.us-east-1.rds.amazonaws.com:3306/filmstr'
 
 SQLALCHEMY_POOL_RECYCLE = 3600
 

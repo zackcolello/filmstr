@@ -1,6 +1,7 @@
 from application import db
 from sqlalchemy import distinct
 
+
 class Users(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     pw = db.Column(db.String, index=True)
@@ -30,6 +31,7 @@ class Friends(db.Model):
     def __repr__(self):
         return '<Friend %r>' % self.friend1
 
+
 class movie_lists(db.Model):
     movieListID = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), index=True, unique=False)
@@ -41,6 +43,7 @@ class movie_lists(db.Model):
 
     def __repr__(self):
         return '<ID %r>' % self.movieListID
+
 
 class actors(db.Model):
     actorID = db.Column(db.Integer, primary_key=True)
@@ -64,6 +67,7 @@ class actor_movie_title(db.Model):
 
     def __repr__(self):
         return '<Name %r>' % self.Name
+
 
 class actor_lists(db.Model):
     actorListID = db.Column(db.Integer, primary_key=True)

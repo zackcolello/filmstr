@@ -1,6 +1,6 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask import Flask, render_template, request, redirect, url_for, session
 from application import db
-from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String
+from sqlalchemy import create_engine, MetaData, Table
 from application.models import Users, Friends, actor_movie_title, movie_lists, Movie, actor_lists, actors
 from application.forms import RegistrationForm
 from functools import wraps
@@ -8,9 +8,8 @@ from functools import wraps
 # Elastic Beanstalk initialization
 application = Flask(__name__)
 application.debug = True
-# change this to your own value
-application.secret_key = 'cC1YCIWOj9GgWspgNEo2'   
-engine = create_engine('mysql+pymysql://zackcolello:Fmtvv22632@db.cqa9wktokxlq.us-west-2.rds.amazonaws.com:3306/db')
+application.secret_key = 'cC1YCIWOj9GgWspgNEo2'
+engine = create_engine('mysql+pymysql://zcolello:password@filmstr.c5l6ey67qvdf.us-east-1.rds.amazonaws.com:3306/filmstr')
 
 
 @application.route('/login/', methods=['GET', 'POST'])
@@ -19,12 +18,12 @@ def login():
     error = ''
 
     try:
-        if request.method == "POST":  # User has entered username
+        if request.method == "POST":
+            # User has entered username
             attempted_username = request.form['inputUsername']
             attempted_password = request.form['inputPassword']
 
             # Check if user exists
-
             metadata = MetaData(bind=engine)
             users = Table('users', metadata, autoload=True)
 
@@ -44,8 +43,6 @@ def login():
                 metadata = MetaData(bind=engine)
                 movies = Table('movie', metadata, autoload=True)
                 movie_lists = Table('movie_lists', metadata, autoload=True)
-
-                # Get movies list
                 ml = movie_lists.select(movie_lists.c.username == session['username']).execute()
 
                 movieIDArray = []
@@ -68,8 +65,6 @@ def login():
         return render_template("login.html", error=error)
 
 
-
-
 @application.route('/logout')
 def logout():
     session.clear()
@@ -83,8 +78,8 @@ def login_required(f):
             return f(*args, **kwargs)
 
         else:
-            flash("You need to log in first.")
             return redirect(url_for('login'))
+
 
 @login_required
 @application.route('/profile/<username>')
@@ -105,7 +100,6 @@ def profile(username):
 
     returnMov = Movie.query.filter(Movie.movieID.in_(myMovieArray)).all()
 
-
     return render_template('profile.html', user=user, movies=returnMov, actors=actors)
 
 
@@ -114,11 +108,9 @@ def ViewSimilarMovies(username):
 
     movies = movie_lists.query.with_entities(movie_lists.movieID).filter(movie_lists.username.like(username)).all()
     myMovies = movie_lists.query.with_entities(movie_lists.movieID).filter(movie_lists.username.like(session['username'])).all()
-
     movieIntersect = set(movies).intersection(myMovies)
 
     myMovieArray = []
-
     for m in movieIntersect:
         myMovieArray.append(m[0])
 
@@ -157,20 +149,16 @@ def searchmovie():
 
     if request.form.get('movieSearch', None) is not None:
         queryTitle = request.form.get('movieSearch', None)
-
-        metadata = MetaData(bind=engine)
         movies = Movie.query.filter(Movie.title.like('%' + queryTitle + '%')).all()
 
-
     return render_template('searchmovie.html', movies=movies)
-
 
 
 @login_required
 @application.route('/deleteactor/<actorName>', methods=['DELETE', 'POST', 'GET'])
 def deleteactor(actorName):
-     # Redirect to index if not logged in
 
+    # Redirect to index if not logged in
     if 'logged_in' not in session:
         return redirect(url_for('index'))
 
@@ -178,7 +166,7 @@ def deleteactor(actorName):
     db.session.commit()
     db.session.close()
 
-    #  Get actors list
+    # Get actors list
     actors = actor_lists.query.filter(actor_lists.username.like(session['username'])).all()
 
     return render_template('myactors.html', actors=actors, deletesuccess="true")
@@ -189,7 +177,6 @@ def deleteactor(actorName):
 def deletemovie(movieID):
 
     # Redirect to index if not logged in
-
     if 'logged_in' not in session:
         return redirect(url_for('index'))
 
@@ -197,12 +184,10 @@ def deletemovie(movieID):
     db.session.commit()
     db.session.close()
 
-        # Get movies list
+    # Get movies list
     metadata = MetaData(bind=engine)
     movies = Table('movie', metadata, autoload=True)
     movielist = Table('movie_lists', metadata, autoload=True)
-
-    # Get movies list
     ml = movielist.select(movielist.c.username == session['username']).execute()
 
     movieIDArray = []
@@ -215,20 +200,16 @@ def deletemovie(movieID):
 
     return render_template('mymovies.html', movies=moviesList, deletesuccess="true")
 
+
 @login_required
 @application.route('/deletefriend/<potentialfriend>', methods=['DELETE', 'POST', 'GET'])
 def deletefriend(potentialfriend):
+
     # Get friends list
     metadata = MetaData(bind=engine)
     friends = Table('friends', metadata, autoload=True)
-    users = Table('users', metadata, autoload=True)
-
-    potentialfriend1 = users.select(users.c.email == potentialfriend).execute().first
 
     if potentialfriend is not None:
-
-            #newfriendship = friends(friend1=session['username'], friend2=potentialfriend['email'])
-            #newfriendship2 = friends(friend1=potentialfriend['email'], friend2=session['username'])
 
             myfriends = friends.select(friends.c.friend1 == session['username']).execute()
             myfriendsfriends = friends.select(friends.c.friend1 == potentialfriend).execute()
@@ -247,7 +228,6 @@ def deletefriend(potentialfriend):
                     break
 
             try:
-
                 Friends.query.filter_by(id=newfriendship2).delete()
                 db.session.commit()
                 db.session.close()
@@ -265,20 +245,20 @@ def deletefriend(potentialfriend):
 @login_required
 @application.route('/addactor/<actorName>', methods=['GET', 'POST'])
 def addactor(actorName):
+
     metadata = MetaData(bind=engine)
     al = Table('actor_lists', metadata, autoload=True)
-
     newActorListItem = actor_lists(username=session['username'], actorName=actorName)
 
     # Check if actor exists
     potentialactor = al.select(al.c.username == session['username']).execute()
 
     for o in potentialactor:
+
+        # Actor already exists
         if o['actorName'] == actorName:
 
-            # actor already exists
-
-            #  Get actors list
+            # Get actors list
             actors = actor_lists.query.filter(actor_lists.username.like(session['username'])).all()
 
             return render_template('myactors.html', actors=actors, actoralreadyaddedfailure="true")
@@ -292,35 +272,30 @@ def addactor(actorName):
 
     return render_template('myactors.html', actors=actors, addsuccess="true")
 
+
 @login_required
 @application.route('/addmovie/<movieID>', methods=['GET', 'POST'])
 def addmovie(movieID):
 
-    metadata = MetaData(bind=engine)
-    ml = Table('movie_lists', metadata, autoload=True)
-    # newMovie = movie_lists(username=session['username'], movieID=movieID)
-
     movieToBeAdded = Movie.query.filter(Movie.movieID.like(movieID)).first()
-
     newMovieListItem = movie_lists(username=session['username'], movieID=movieToBeAdded.movieID)
 
     # Check if movie exists
     potentialMovie = movie_lists.query.filter(movie_lists.username.like(session['username'])).first()
 
     if potentialMovie is not None:
+
+        # Movie already exists
         if potentialMovie.movieID == int(movieID):
-            # Movie already exists
 
             # Get movies list
             metadata = MetaData(bind=engine)
             movies = Table('movie', metadata, autoload=True)
 
             # Redirect to index if not logged in
-
             if 'logged_in' not in session:
                 return redirect(url_for('index'))
 
-            movie = Table('movie', metadata, autoload=True)
             movie_list = Table('movie_lists', metadata, autoload=True)
 
             # Get movies list
@@ -344,8 +319,6 @@ def addmovie(movieID):
     metadata = MetaData(bind=engine)
     movies = Table('movie', metadata, autoload=True)
     movielist = Table('movie_lists', metadata, autoload=True)
-
-    # Get movies list
     ml = movielist.select(movielist.c.username == session['username']).execute()
 
     movieIDArray = []
@@ -369,6 +342,7 @@ def addfriend():
     users = Table('users', metadata, autoload=True)
 
     if request.form.get('friendName', None) is not None:
+
         friendsearch = request.form.get('friendName', None)
         potentialfriend = users.select(users.c.email == friendsearch).execute().first()
 
@@ -378,6 +352,7 @@ def addfriend():
             newfriendship2 = Friends(friend1=potentialfriend['email'], friend2=session['username'])
 
             if db.session.query(friends).filter(friends.c.friend1 == newfriendship.friend1, friends.c.friend2==newfriendship.friend2).count() > 0:
+
                 # User entered does not exist
                 r = friends.select(friends.c.friend1 == session['username']).execute()
 
@@ -400,6 +375,7 @@ def addfriend():
             except Exception as e:
                 db.session.rollback()
         else:
+
             # User entered does not exist
             r = friends.select(friends.c.friend1 == session['username']).execute()
 
@@ -413,9 +389,6 @@ def addfriend():
 
             return render_template('myfriends.html', friends=friends, addfailure="true")
 
-
-
-
     return redirect(url_for('myfriends'))
 
 
@@ -428,7 +401,6 @@ def home():
     movies = Table('movie', metadata, autoload=True)
 
     # Redirect to index if not logged in
-
     if 'logged_in' not in session:
         return redirect(url_for('index'))
 
@@ -436,7 +408,6 @@ def home():
     metadata = MetaData(bind=engine)
     friends = Table('friends', metadata, autoload=True)
     users = Table('users', metadata, autoload=True)
-    movie = Table('movie', metadata, autoload=True)
     movie_lists = Table('movie_lists', metadata, autoload=True)
 
     r = friends.select(friends.c.friend1 == session['username']).execute()
@@ -460,16 +431,14 @@ def home():
     for object in movieIDArray:
         moviesList += db.session.query(movies).filter(movies.c.movieID == object)
 
-
     if 'logged_in' not in session:
         return redirect(url_for('index'))
 
     return render_template('home.html', friends=friends, movies=moviesList)
 
+
 @application.route('/signup', methods=['GET', 'POST'])
 def signup():
-
-    error = ''
 
     try:
         form = RegistrationForm(request.form)
@@ -480,14 +449,13 @@ def signup():
             firstName = form.inputFirstName.data
             lastName = form.inputLastName.data
 
-            # check if user already exists
-
+            # Check if user already exists
             metadata = MetaData(bind=engine)
             users = Table('users', metadata, autoload=True)
-
             r = users.select(users.c.email == username).execute().first()
 
             if r is not None:
+
                 error = "Username already taken. Try again."
                 return render_template('signup.html', error=error)
 
@@ -510,8 +478,6 @@ def signup():
 
     except Exception as e:
         return str(e)
-
-    # return render_template('signup.html')
 
 
 @application.route('/actor/', methods=['GET', 'POST'])
@@ -538,7 +504,9 @@ def movie(movieID):
     movie1 = Movie.query.with_entities(Movie.title, Movie.genre, Movie.movieID).filter(Movie.movieID.like(movieID)).first()
     Str = movie1[0]
     actors = actor_movie_title.query.filter(actor_movie_title.Movie.like(Str)).limit(30).all()
+
     return render_template('movie.html', movie=movie1, actors=actors)
+
 
 @login_required
 @application.route('/myactors', methods=['GET', 'POST'])
@@ -563,11 +531,9 @@ def mymovies():
     movies = Table('movie', metadata, autoload=True)
 
     # Redirect to index if not logged in
-
     if 'logged_in' not in session:
         return redirect(url_for('index'))
 
-    movie = Table('movie', metadata, autoload=True)
     movie_lists = Table('movie_lists', metadata, autoload=True)
 
     # Get movies list
@@ -587,10 +553,7 @@ def mymovies():
 @application.route('/myfriends', methods=['GET', 'POST'])
 def myfriends():
 
-    # Get friends list
-
     # Redirect to index if not logged in
-
     if 'logged_in' not in session:
         return redirect(url_for('index'))
 
