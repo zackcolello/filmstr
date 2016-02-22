@@ -2,46 +2,50 @@
 
 {% block content %}
 
-  <div class="container">
-    <div class="jumbotron" align="center">
+    <div class="container">
+        <div class="jumbotron" align="center">
 
-<h3 align="center" id="filmstr" style="font-size:40px; color:black; margin-top:-20px">Actors {{ username }} and I both like</h3>
+            <h3 align="center" id="filmstr" style="font-size:40px; color:black; margin-top:-20px">Actors {{ username }}
+                and I both like</h3>
 
-<div class="container">
-<br>
-{% if actors|length > 0 %}
-    <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>name</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in actors %}
-                    <tr>
-                        <td>{{ item['actorName'] }}</td>
-                        <td>
-                            <a href="/actor/{{ item['actorName'] }}" class="btn btn-default" role="button"><span class="glyphicon glyphicon-eye-open"></span> View Actor</a>
-                        </td>
-                    </tr>
-                {% endfor %}
+            <div class="container">
+                <br>
+                {% if actors|length > 0 %}
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>name</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for item in actors %}
+                            <tr>
+                                <td>{{ item['actorName'] }}</td>
+                                <td>
+                                    <a href="/actor/{{ item['actorName'] }}" class="btn btn-default" role="button"><span
+                                            class="glyphicon glyphicon-eye-open"></span> View Actor</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
 
-             </tbody>
-        </table>
+                        </tbody>
+                    </table>
 
-{% else %}
-            <br><br><p>You don't have any favorite actors in common with {{ username }}. Check out what actors they like to add them!</p>
-{% endif %}
+                {% else %}
+                    <br><br>
+                    <p>You don't have any favorite actors in common with {{ username }}. Check out what actors they like
+                        to add them!</p>
+                {% endif %}
 
-        <a href="/profile/{{ username }}" class="btn btn-default" role="button">Back</a>
+                <a href="/profile/{{ username }}" class="btn btn-default" role="button">Back</a>
 
-</div><!-- tab content -->
-</div><!-- end of container -->
+            </div>
+        </div>
 
 
-</div>
-</div>
+    </div>
+    </div>
 
 
 {% endblock %}

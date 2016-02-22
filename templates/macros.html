@@ -45,7 +45,7 @@
 {% macro render_date_field(field) -%}
     <div class="date">
         <label>
-            {{ field(class_=class_) }} 
+            {{ field(class_=class_) }}
         </label>
     </div>
 {%- endmacro %}
@@ -63,10 +63,10 @@
 
     <div class="control-group {% if field.errors %}error{% endif %}">
 
-    {{ field(class_=class_) }}
-    {% if field.errors %}
-        <span class="error help-inline" style="color: red;">{{ field.errors|join(', ') }}</span>
-    {% endif %}
+        {{ field(class_=class_) }}
+        {% if field.errors %}
+            <span class="error help-inline" style="color: red;">{{ field.errors|join(', ') }}</span>
+        {% endif %}
     </div>
 
 {%- endmacro %}

@@ -2,51 +2,55 @@
 
 {% block content %}
 
-  <div class="container">
-    <div class="jumbotron" align="center">
+    <div class="container">
+        <div class="jumbotron" align="center">
 
-<h3 align="center" id="filmstr" style="font-size:40px; color:black; margin-top:-20px">Movies {{ username }} and I both like</h3>
+            <h3 align="center" id="filmstr" style="font-size:40px; color:black; margin-top:-20px">Movies {{ username }}
+                and I both like</h3>
 
-<div class="container">
-<br>
+            <div class="container">
+                <br>
 
-{% if movies|length > 0 %}
-<table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Release Date</th>
-                    <th>Genre</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in movies %}
-                    <tr>
-                        <td>{{ item.title }}</td>
-                        <td>{{ item.releaseDate }}</td>
-                        <td>{{ item.genre }}</td>
-                        <td>
-                            <a href="/movie/{{ item['movieID']}}" class="btn btn-default" role="button"><span class="glyphicon glyphicon-eye-open"></span> View Movie</a>
-                        </td>
-                    </tr>
-                {% endfor %}
+                {% if movies|length > 0 %}
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Release Date</th>
+                            <th>Genre</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for item in movies %}
+                            <tr>
+                                <td>{{ item.title }}</td>
+                                <td>{{ item.releaseDate }}</td>
+                                <td>{{ item.genre }}</td>
+                                <td>
+                                    <a href="/movie/{{ item['movieID'] }}" class="btn btn-default" role="button"><span
+                                            class="glyphicon glyphicon-eye-open"></span> View Movie</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
 
-             </tbody>
-        </table>
+                        </tbody>
+                    </table>
 
-{% else %}
-            <br><br><p>You don't have any favorite movies in common with {{ username }}. Check out what movies they like to add them!</p>
-{% endif %}
+                {% else %}
+                    <br><br>
+                    <p>You don't have any favorite movies in common with {{ username }}. Check out what movies they like
+                        to add them!</p>
+                {% endif %}
 
-            <a href="/profile/{{ username }}" class="btn btn-default" role="button">Back</a>
+                <a href="/profile/{{ username }}" class="btn btn-default" role="button">Back</a>
 
-</div><!-- tab content -->
-</div><!-- end of container -->
+            </div>
+        </div>
 
 
-</div>
-</div>
+    </div>
+    </div>
 
 
 {% endblock %}

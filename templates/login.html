@@ -4,33 +4,42 @@
 
 
     <div class="container">
-    <div class="jumbotron" align="center">
+        <div class="jumbotron" align="center">
 
-          <div class="container">
-              <h2 class="form-signin-heading">please sign in.</h2>
+            <div class="container">
+                <h2 class="form-signin-heading">please sign in.</h2>
+
                 <p style="color:red">{{ error }}</p>
-              <form class="form form-signin" method="post" style="max-width: 300px">
 
-                <label for="inputUsername" class="sr-only">Email address</label>
-                <input style="margin-bottom:10px" type="text" id="inputUsername" name="inputUsername" class="form-control" placeholder="Username" value="{{ request.form.inputUsername }}" required autofocus>
+                <form class="form form-signin" method="post" style="max-width: 300px">
 
-                  <label for="inputPassword" class="sr-only">Password</label>
-                    <input style="margin-bottom:10px" type="password" name="inputPassword" id="inputPassword" value="{{ request.form.inputPassword }}" class="form-control" placeholder="Password" required>
+                    <label for="inputUsername" class="sr-only">Email address</label>
+                    <input style="margin-bottom:10px" type="text" id="inputUsername" name="inputUsername"
+                           class="form-control" placeholder="Username" value="{{ request.form.inputUsername }}" required
+                           autofocus>
 
-                <input class="btn btn-lg btn-primary btn-block" type="submit" value="Login">
-              </form>
+                    <label for="inputPassword" class="sr-only">Password</label>
+                    <input style="margin-bottom:10px" type="password" name="inputPassword" id="inputPassword"
+                           value="{{ request.form.inputPassword }}" class="form-control" placeholder="Password"
+                           required>
 
-              <br/><br/><hr/>
-              Don't have an account yet?
-              <form action="/signup">
-                <button style="max-width: 300px; margin-top: 5px" class="btn btn-lg btn-success btn-block" type="submit">Sign Up</button>
-              </form>
+                    <input class="btn btn-lg btn-primary btn-block" type="submit" value="Login">
+                </form>
+
+                <br/><br/>
+                <hr/>
+                Don't have an account yet?
+                <form action="/signup">
+                    <button style="max-width: 300px; margin-top: 5px" class="btn btn-lg btn-success btn-block"
+                            type="submit">Sign Up
+                    </button>
+                </form>
 
 
+            </div>
+
+        </div>
     </div>
-
-  </div>
-</div>
 
 {% endblock %}
 

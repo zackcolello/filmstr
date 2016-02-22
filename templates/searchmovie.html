@@ -3,59 +3,59 @@
 {% block content %}
 
     <div class="container">
-    <div class="jumbotron" align="center">
+        <div class="jumbotron" align="center">
 
-<h3 align="center" id="filmstr" style="font-size:40px; color:black; margin-top:-20px">Movie search results</h3>
+            <h3 align="center" id="filmstr" style="font-size:40px; color:black; margin-top:-20px">Movie search
+                results</h3>
 
- <form class="form-inline" action="/searchmovie/" method="post">
+            <form class="form-inline" action="/searchmovie/" method="post">
                 <div class="form-group">
                     <label for="movieSearch">Search for a new movie:</label>
-                    <input type="text" class="form-control" id="movieSearch" name="movieSearch" placeholder="Movie title" value="{{ request.form.movieSearch }}" autofocus>
+                    <input type="text" class="form-control" id="movieSearch" name="movieSearch"
+                           placeholder="Movie title" value="{{ request.form.movieSearch }}" autofocus>
                 </div>
                 <input type="submit" class="btn btn-default" value="Search">
             </form>
-<div class="container">
-<br>
+            <div class="container">
+                <br>
 
-<table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Release Date</th>
-                    <th>Genre</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in movies %}
+                <table class="table table-striped">
+                    <thead>
                     <tr>
-                        <td>{{ item.title }}</td>
-                        <td>{{ item.releaseDate }}</td>
-                        <td>{{ item.genre }}</td>
-                        <td>
-                            <a href="/movie/{{ item.movieID }}" class="btn btn-default" role="button">View</a>
-                        </td>
-                        <td>
-                            <a href="/addmovie/{{ item.movieID }}" class="btn btn-default" role="button"><span class="glyphicon glyphicon-star"></span> Favorite</a>
-                        </td>
-
+                        <th>Title</th>
+                        <th>Release Date</th>
+                        <th>Genre</th>
+                        <th></th>
                     </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in movies %}
+                        <tr>
+                            <td>{{ item.title }}</td>
+                            <td>{{ item.releaseDate }}</td>
+                            <td>{{ item.genre }}</td>
+                            <td>
+                                <a href="/movie/{{ item.movieID }}" class="btn btn-default" role="button">View</a>
+                            </td>
+                            <td>
+                                <a href="/addmovie/{{ item.movieID }}" class="btn btn-default" role="button"><span
+                                        class="glyphicon glyphicon-star"></span> Favorite</a>
+                            </td>
 
-                {% endfor %}
+                        </tr>
 
-             </tbody>
-        </table>
+                    {% endfor %}
 
-
-
-
-
-</div><!-- tab content -->
-</div><!-- end of container -->
+                    </tbody>
+                </table>
 
 
-</div>
-</div>
+            </div>
+        </div>
+
+
+    </div>
+    </div>
 
 
 {% endblock %}

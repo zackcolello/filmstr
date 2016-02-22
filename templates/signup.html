@@ -4,40 +4,53 @@
 
 
     <div class="container">
-    <div class="jumbotron" align="center">
+        <div class="jumbotron" align="center">
 
-          <div class="container">
+            <div class="container">
 
                 <form class="form form-signin" method="post" style="max-width: 300px">
-                <h2 class="form-signin-heading">sign up to start finding movies.</h2>
+                    <h2 class="form-signin-heading">sign up to start finding movies.</h2>
+
                     <p style="color:red">{{ error }}</p>
 
 
-                <label for="inputFirstName" class="sr-only">First Name</label>
-                <input style="margin-bottom:10px" type="text" id="inputFirstName" name="inputFirstName" class="form-control" placeholder="First Name" value="{{ request.form.inputFirstName }}" required>
+                    <label for="inputFirstName" class="sr-only">First Name</label>
+                    <input style="margin-bottom:10px" type="text" id="inputFirstName" name="inputFirstName"
+                           class="form-control" placeholder="First Name" value="{{ request.form.inputFirstName }}"
+                           required>
 
-                <label for="inputLastName" class="sr-only">Last Name</label>
-                <input style="margin-bottom:10px" type="text" id="inputLastName" name="inputLastName" class="form-control" placeholder="Last Name" value="{{ request.form.inputLastName }}" required>
+                    <label for="inputLastName" class="sr-only">Last Name</label>
+                    <input style="margin-bottom:10px" type="text" id="inputLastName" name="inputLastName"
+                           class="form-control" placeholder="Last Name" value="{{ request.form.inputLastName }}"
+                           required>
 
-                <label for="inputUsername" class="sr-only">Email address</label>
-                <input style="margin-bottom:10px" type="text" id="inputUsername" name="inputUsername" class="form-control" placeholder="Username" value="{{ request.form.inputUsername }}" required autofocus>
+                    <label for="inputUsername" class="sr-only">Email address</label>
+                    <input style="margin-bottom:10px" type="text" id="inputUsername" name="inputUsername"
+                           class="form-control" placeholder="Username" value="{{ request.form.inputUsername }}" required
+                           autofocus>
 
-                  <label for="inputPassword" class="sr-only">Password</label>
-                    <input style="margin-bottom:10px" type="password" name="inputPassword" id="inputPassword" value="{{ request.form.inputPassword }}" class="form-control" placeholder="Password" required>
+                    <label for="inputPassword" class="sr-only">Password</label>
+                    <input style="margin-bottom:10px" type="password" name="inputPassword" id="inputPassword"
+                           value="{{ request.form.inputPassword }}" class="form-control" placeholder="Password"
+                           required>
 
-                <input class="btn btn-lg btn-success btn-block" type="submit" value="Signup">
-      </form>
+                    <input class="btn btn-lg btn-success btn-block" type="submit" value="Signup">
+                </form>
 
-              <br/><br/><hr/>
-              already have an account?
-              <form action="/login">
-                <button style="max-width: 300px; margin-top: 5px" class="btn btn-lg btn-primary btn-block" type="submit">Log In</button>
-              </form>
+                <br/><br/>
+                <hr/>
 
+                already have an account?
+                <form action="/login">
+                    <button style="max-width: 300px; margin-top: 5px" class="btn btn-lg btn-primary btn-block"
+                            type="submit">Log In
+                    </button>
+                </form>
+
+            </div>
+
+        </div>
     </div>
-
-  </div>
-</div>
 
 {% endblock %}
 

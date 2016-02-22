@@ -9,7 +9,7 @@ from functools import wraps
 application = Flask(__name__)
 application.debug = True
 application.secret_key = 'cC1YCIWOj9GgWspgNEo2'
-engine = create_engine('mysql+pymysql://zcolello:password@filmstr.c5l6ey67qvdf.us-east-1.rds.amazonaws.com:3306/filmstr')
+engine = create_engine('mysql+pymysql://zackcolello:filmstrpassword@filmstr.c5l6ey67qvdf.us-east-1.rds.amazonaws.com:3306/ebdb')
 
 
 @application.route('/login/', methods=['GET', 'POST'])

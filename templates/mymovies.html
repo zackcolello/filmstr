@@ -2,84 +2,93 @@
 
 {% block content %}
 
-     {% if loginsuccess %}
+    {% if loginsuccess %}
         <div class="alert alert-success alert-dismissible" role="alert" style="margin-left:65px; margin-right:65px">
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                    aria-hidden="true">&times;</span></button>
             <strong>Congratulations!</strong> Successfully logged in.
         </div>
-     {% endif %}
+    {% endif %}
 
     {% if deletesuccess %}
         <div class="alert alert-success alert-dismissible" role="alert" style="margin-left:65px; margin-right:65px">
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                    aria-hidden="true">&times;</span></button>
             <strong>Congratulations!</strong> Movie was successfully deleted.
         </div>
-     {% endif %}
+    {% endif %}
 
-        {% if addsuccess %}
+    {% if addsuccess %}
         <div class="alert alert-success alert-dismissible" role="alert" style="margin-left:65px; margin-right:65px">
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                    aria-hidden="true">&times;</span></button>
             <strong>Congratulations!</strong> Movie was successfully added.
         </div>
-     {% endif %}
+    {% endif %}
 
     {% if moviealreadyaddedfailure %}
         <div class="alert alert-warning alert-dismissible" role="alert" style="margin-left:65px; margin-right:65px">
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                    aria-hidden="true">&times;</span></button>
             You already have that movie added!
         </div>
-     {% endif %}
+    {% endif %}
 
     <div class="container">
-    <div class="jumbotron" align="center">
-        <h3 align="center" id="filmstr" style="font-size:40px; color:black; margin-top:-20px">my movies</h3>
-             <!-- Add movie -->
+        <div class="jumbotron" align="center">
+            <h3 align="center" id="filmstr" style="font-size:40px; color:black; margin-top:-20px">my movies</h3>
+
+            <!-- Add movie -->
             <form class="form-inline" action="/searchmovie/" method="post">
                 <div class="form-group">
                     <label for="movieSearch">Search for a new movie:</label>
-                    <input type="text" class="form-control" id="movieSearch" name="movieSearch" placeholder="Movie title" value="{{ request.form.movieSearch }}" autofocus>
+                    <input type="text" class="form-control" id="movieSearch" name="movieSearch"
+                           placeholder="Movie title" value="{{ request.form.movieSearch }}" autofocus>
                 </div>
                 <input type="submit" class="btn btn-default" value="Search">
             </form>
 
 
-        <br>
-        <h4>My Favorite Movies</h4>
+            <br>
+            <h4>My Favorite Movies</h4>
+
             <!-- Movie table -->
-        {% if movies|length > 0 %}
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Release Date</th>
-                    <th>genre</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in movies %}
+            {% if movies|length > 0 %}
+                <table class="table table-striped">
+                    <thead>
                     <tr>
-                        <td>{{ item.title }}</td>
-                        <td>{{ item.releaseDate }}</td>
-                        <td>{{ item.genre }}</td>
-                        <td>
-                            <a href="/movie/{{ item.movieID }}" class="btn btn-default" role="button"><span class="glyphicon glyphicon-eye-open"></span> View Movie</a>
-                        </td>
-                        <td>
-                            <a href="/deletemovie/{{ item.movieID }}" class="btn btn-default" role="button"><span class="glyphicon glyphicon-remove"></span></a>
-                        </td>
+                        <th>Title</th>
+                        <th>Release Date</th>
+                        <th>genre</th>
                     </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in movies %}
+                        <tr>
+                            <td>{{ item.title }}</td>
+                            <td>{{ item.releaseDate }}</td>
+                            <td>{{ item.genre }}</td>
+                            <td>
+                                <a href="/movie/{{ item.movieID }}" class="btn btn-default" role="button"><span
+                                        class="glyphicon glyphicon-eye-open"></span> View Movie</a>
+                            </td>
+                            <td>
+                                <a href="/deletemovie/{{ item.movieID }}" class="btn btn-default" role="button"><span
+                                        class="glyphicon glyphicon-remove"></span></a>
+                            </td>
+                        </tr>
 
-                {% endfor %}
+                    {% endfor %}
 
-             </tbody>
-        </table>
+                    </tbody>
+                </table>
 
-        {% else %}
-            <br><br><p>You don't have any favorite movies yet. Search for your favorite movies to get started!</p>
-        {% endif %}
+            {% else %}
+                <br><br><p>You don't have any favorite movies yet. Search for your favorite movies to get started!</p>
+            {% endif %}
 
 
-    </div><!-- tab content -->
-</div><!-- end of container -->
+        </div>
+    </div>
 
 {% endblock %}
